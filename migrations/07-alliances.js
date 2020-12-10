@@ -1,0 +1,27 @@
+exports.up = knex =>
+    knex.schema.createTable('alliances', table => {
+        table.increments('id')
+            .primary()
+            .unique()
+            .notNullable()
+        table.unique(['game', 'name'])
+        table.integer('game')
+            .references('id')
+            .inTable('games')
+            .onUpdate('CASCADE')
+            .onDelete('CASCADE')
+        table.varchar('name', 32)
+            .notNullable()
+        table.bigint('funds')
+            .notNullable()
+            .defaultTo(0)
+        table.integer('attack_buff')
+            .notNullable()
+            .defaultTo(0)
+        table.integer('defence_buff')
+            .notNullable()
+            .defaultTo(0)
+    })
+
+exports.down = knex =>
+    knex.schema.dropTableIfExists('alliances')

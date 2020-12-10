@@ -1,0 +1,7 @@
+Use text datatype unless...
+    -you need to set a character limit
+    -you need to support other databases that don't support text as a datatype
+Because
+    -you save cycles by not checking for character length
+    -there's no performance hit over varchar
+    -it's faster in some instances

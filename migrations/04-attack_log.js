@@ -1,0 +1,25 @@
+exports.up = knex =>
+    knex.schema.createTable('attack_log', table => {
+        table.increments('id')
+            .primary()
+            .unique()
+            .notNullable()
+        table.text('timestamp')
+            .notNullable()
+        table.varchar('type', 16)
+            .notNullable()
+        table.integer('attacker')
+            .references('id')
+            .inTable('players')
+            .onUpdate('CASCADE')
+            .onDelete('CASCADE')
+        table.integer('defender')
+            .references('id')
+            .inTable('players')
+            .onUpdate('CASCADE')
+            .onDelete('CASCADE')
+        table.json('details')
+    })
+
+exports.down = knex =>
+    knex.schema.dropTableIfExists('attack_log')
