@@ -17,6 +17,8 @@ app.use(cors())
 app.use(express.json())
 
 // API
+const routes = require('./routes')
+routes(app)
 
 // SERVER MESSAGE
 app.listen(PORT, () => {
