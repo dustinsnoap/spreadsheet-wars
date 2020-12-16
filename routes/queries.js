@@ -4,7 +4,7 @@
 // const {log_error} = require('../tools/errors')
 
 module.exports = (app) => {
-    app.post('/action', query)
+    app.post('/query', query)
 }
 
 const query = async (req, res) => {

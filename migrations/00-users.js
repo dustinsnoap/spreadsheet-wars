@@ -12,6 +12,7 @@ exports.up = knex =>
         table.text('email')
             .unique()
         table.integer('credits')
+        //add user role ie. admin, player, mod
     })
 
 exports.down = knex =>
