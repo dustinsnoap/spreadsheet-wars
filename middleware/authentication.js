@@ -1,5 +1,9 @@
 //IMPORTS
+//dependency
+const crypt = require('bcrypt')
+//local
 const {get_one} = require('../models/general')
+const settings = require('../config/settings')
 
 //GLOBAL VARIABLES
 const TABLE = 'users'
@@ -14,7 +18,12 @@ class error {
     }
 }
 
-const check_username = async (req, res, next) => {
+const password_criteria = (req, res, next) => {
+
+    next()
+}
+
+const username_criteria = async (req, res, next) => {
     //add global middleware to do this
     req.errors = []
 
@@ -30,7 +39,7 @@ const check_username = async (req, res, next) => {
             req.errors.push(new error({type:'invalid characters', field:'username', detail:'Only alphanumeric allowed.'}))
 
         //check username length
-        if(req.body.username.length < 3 || req.body.username.length > 16)
+        if(req.body.username.length < settings.username_min_length || req.body.username.length > settings.username_max_length)
             req.errors.push(new error({type:'field length', field:'username', detail:'Username must be between 3 and 16 characters.'}))
 
         //skip if criteria isn't met
@@ -46,5 +55,6 @@ const check_username = async (req, res, next) => {
 
 
 module.exports = {
-    check_username
+    username_criteria,
+    password_criteria
 }

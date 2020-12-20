@@ -1,10 +1,12 @@
+const settings = require('../config/settings')
+
 exports.up = knex =>
     knex.schema.createTable('users', table => {
         table.increments('id')
             .primary()
             .unique()
             .notNullable()
-        table.varchar('username', 16)
+        table.varchar('username', settings.username_max_length)
             .unique()
             .notNullable()
         table.text('password')

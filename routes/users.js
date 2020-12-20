@@ -5,7 +5,7 @@ const {add_one} = require('../models/general')
 // const {log_error} = require('../tools/errors')
 
 module.exports = (app) => {
-    app.post('/user/register', mw.check_username, register)
+    app.post('/user/register', mw.username_criteria, mw.password_criteria, register)
     app.post('/user/login', login)
     app.post('/user/logout', logout)
     app.post('/user/credits', credits)
