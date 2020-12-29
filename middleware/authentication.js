@@ -1,8 +1,9 @@
 //IMPORTS
 //dependency
 const crypt = require('bcrypt')
+const uuid = require('uuid')
 //local
-const {get_one} = require('../models/general')
+const {add_one, get_one} = require('../models/general')
 const settings = require('../config/settings')
 
 //GLOBAL VARIABLES
@@ -16,6 +17,52 @@ class error {
         this.code = code
         this.detail = detail
     }
+}
+
+const grant_access_to_user = async (req, res, next) => {
+    //skip if errors
+    if(req.errors.length) {next(); return}
+
+    try {
+        if(!req.user && req.body.username) req.user = await get_one('users', {username: req.body.username})
+        const uid = uuid.v4()
+        const timestamp = 'make a tool for this'
+        await add_one('online', {user: req.user.id, uid, timestamp})
+    } catch(err) {
+        req.errors.push(new error({type: 'database', detail: 'Database broked, try again later.'}))
+    }
+
+    next()
+}
+
+const verify_credentials = async (req, res, next) => {
+    //initialize error variable if not already
+    req.errors = req.errors ? req.errors : []
+
+    //check if there is a username field
+    if(!req.body.username)
+        req.errors.push(new error({type: 'missing field', field: 'username'}))
+    //check if there is a password field
+    if(!req.body.password)
+        req.errors.push(new error({type: 'missing field', field: 'password'}))
+
+    //skip database calls if errors
+    if(req.errors.length) {next(); return}
+
+    //check if user exists
+    req.user = await get_one('users', {username: req.body.username})
+    if(!req.user.password)
+        req.errors.push(new error({type: 'unknown user', detail: 'username not found.'}))
+    
+    //check if password is correct
+    if(!(req.user.password && crypt.compareSync(req.body.password, req.user.password)))
+        req.errors.push(new error({type: 'incorrect password', field: 'password', detail: 'Wrong password given.'}))
+
+    //if no errors; add token
+    if(!req.errors.length)
+        req.token = uuid.v4()
+
+    next()
 }
 
 const password_criteria = (req, res, next) => {
@@ -87,5 +134,7 @@ const username_criteria = async (req, res, next) => {
 
 module.exports = {
     username_criteria,
-    password_criteria
+    password_criteria,
+    verify_credentials,
+    grant_access_to_user
 }
